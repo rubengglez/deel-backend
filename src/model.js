@@ -5,7 +5,19 @@ const sequelize = new Sequelize({
   storage: './database.sqlite3'
 });
 
-class Profile extends Sequelize.Model {}
+class Profile extends Sequelize.Model {
+  canAccess(contract) {
+    if (this.#isClient()) {
+      return this.id === contract.ClientId
+    }
+    return this.id === contract.ContractorId
+  }
+
+  #isClient() {
+    return this.type === 'client'
+  }
+}
+
 Profile.init(
   {
     firstName: {
