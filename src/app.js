@@ -12,8 +12,7 @@ const retrieveBestClients = require('./use-cases/admin/retrieveBestClients');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(getProfile)
-app.set('models', sequelize.models)
+app.use(getProfile(sequelize.models))
 
 app.get('/contracts/:id', async (req, res) =>{
     const {id} = req.params

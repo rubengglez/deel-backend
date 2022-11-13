@@ -1,6 +1,6 @@
 
-const getProfile = async (req, res, next) => {
-    const {Profile} = req.app.get('models')
+const getProfile = (models) => async (req, res, next) => {
+    const {Profile} = models
     if (req.get('profile_id') === 'admin') {
         next()
         return
