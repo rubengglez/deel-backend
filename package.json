@@ -11,7 +11,7 @@
   "scripts": {
     "start": "nodemon ./src/server.js",
     "seed": "node ./scripts/seedDb.js",
-    "test": "jest"
+    "acceptance": "jest"
   },
   "devDependencies": {
     "axios": "^1.1.3",
