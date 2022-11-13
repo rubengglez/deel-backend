@@ -1,3 +1,4 @@
+const {sequelize} = require('../../src/model')
 const ApiClient = require('./ApiClient')
 
 describe('Given api is running', function() {
@@ -78,5 +79,66 @@ describe('Given api is running', function() {
 		unpaidJobs = await ApiClient.unpaidJobs(profileId)
 		expect(unpaidJobs).toHaveLength(1)
 		expect(unpaidJobs[0].price).toEqual(200)
+	})
+
+	it('nothing happens if job is already paid', async () => {
+		const profileId = 4
+		const jobId = 6
+		await ApiClient.pay(jobId, profileId)
+	})
+
+	it('should NOT be able to add balance due to client given is not the same than the user given', async () => {
+		return expect(ApiClient.deposit(1, 1, 3)).rejects.toThrow('Forbidden')
+	})
+
+	describe('Given job can not be paid by not enough balance', () => {
+		let job, client, contract
+
+		beforeEach(async () => {
+			const {Job, Profile, Contract} = sequelize.models
+			client = await Profile.create({
+				firstName: 'test',
+				lastName: 'test',
+				profession: 'test',
+				balance: 100,
+				type:'client'
+			})
+			contract = await Contract.create({
+      	terms: 'bla bla bla',
+      	status: 'in_progress',
+      	ClientId: client.id,
+      	ContractorId: 6
+    	})
+			job = await Job.create({
+				description: 'work',
+      	price: 101,
+      	ContractId: contract.id,
+			})
+
+			let unpaidJobs = await ApiClient.unpaidJobs(client.id)
+			expect(unpaidJobs).toHaveLength(1)
+
+			return expect(ApiClient.pay(job.id, client.id)).rejects.toThrow('Forbidden')
+		})
+
+		afterEach(async () => {
+			await Promise.all([
+				job.destroy(),
+				contract.destroy(),
+				client.destroy()
+			])
+		})
+
+		it('should be able to add balance and then pay the job', async () => {
+			await ApiClient.deposit(client.id, 10, client.id)
+			await ApiClient.pay(job.id, client.id)
+
+			let unpaidJobs = await ApiClient.unpaidJobs(client.id)
+			expect(unpaidJobs).toHaveLength(0)
+		})
+
+		it('should NOT be able to add balance due to balance given is more than maximum', async () => {
+			return expect(ApiClient.deposit(client.id, 30, client.id)).rejects.toThrow('Forbidden')
+		})
 	})
 })

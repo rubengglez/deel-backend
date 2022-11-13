@@ -44,9 +44,21 @@ async function pay(jobId, profileId) {
 	}
 }
 
+async function deposit(clientId, amount, profileId) {
+	try {
+		const response = await axios.post(`${URL}/balances/deposit/${clientId}`, {
+			amount
+		}, headers(profileId));
+		return response.data;
+	} catch (err) {
+		throw new Error(err.response.statusText);
+	}
+}
+
 module.exports = {
 	getContract,
 	contracts,
 	unpaidJobs,
 	pay,
+	deposit,
 };

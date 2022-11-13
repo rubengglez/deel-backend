@@ -6,6 +6,7 @@ const findContractById = require('./use-cases/findContractById')
 const searchContractsByStatuses = require('./use-cases/searchContractsByStatuses')
 const retrieveUnpaidJobs = require('./use-cases/retrieveUnpaidJobs')
 const payJob = require('./use-cases/payJob')
+const addDeposit = require('./use-cases/addDeposit');
 
 const app = express();
 app.use(bodyParser.json());
@@ -39,5 +40,15 @@ app.post('/jobs/:job_id/pay', async (req, res) => {
         res.status(403).end()
     }
 })
+
+app.post('/balances/deposit/:userId', async (req, res) => {
+    try {
+        await addDeposit(parseInt(req.params.userId), req.body.amount, req.profile)
+        res.json()
+    } catch(exception) {
+        res.status(403).end()
+    }
+})
+
 
 module.exports = app;

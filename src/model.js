@@ -44,6 +44,10 @@ class Profile extends Sequelize.Model {
       return Promise.reject('only a client can be paid')
     }
 
+    if (job.isPaid()) {
+      return Promise.resolve()
+    }
+
     if (this.balance < job.price) {
      return Promise.reject('job can not be paid due to not enough money in balance')
     }
@@ -52,6 +56,18 @@ class Profile extends Sequelize.Model {
 
     await this.save({ transaction: t })
     await job.pay(t)
+  }
+
+  async addDeposit(amount, totalToPay, t) {
+    if (!this.isClient()) {
+      return Promise.reject('only a client can be paid')
+    }
+    if (amount > totalToPay * 0.25) {
+      return Promise.reject('can add balance due to more than maximum')
+    }
+
+    this.balance += amount
+    await this.save({ transaction: t })
   }
 }
 
@@ -104,6 +120,10 @@ class Job extends Sequelize.Model {
     this.paid = true;
     this.paymentDate = new Date()
     return this.save({transaction: t})
+  }
+
+  isPaid() {
+    return this.paid
   }
 }
 
