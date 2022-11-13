@@ -55,10 +55,34 @@ async function deposit(clientId, amount, profileId) {
 	}
 }
 
+async function bestProfessionAsAdmin(start, end) {
+	try {
+		const response = await axios.get(`${URL}/admin/best-profession?start=${start}&end=${end}`, headers('admin'));
+		return response.data;
+	} catch (err) {
+		throw new Error(err.response.statusText);
+	}
+}
+
+async function bestClientsAsAdmin(start, end, limit) {
+	let queryString = `?start=${start}&end=${end}`
+	if (limit) {
+		queryString += `&limit=${limit}`
+	}
+	try {
+		const response = await axios.get(`${URL}/admin/best-clients${queryString}`, headers('admin'));
+		return response.data;
+	} catch (err) {
+		throw new Error(err.response.statusText);
+	}
+}
+
 module.exports = {
 	getContract,
 	contracts,
 	unpaidJobs,
 	pay,
 	deposit,
+	bestProfessionAsAdmin,
+	bestClientsAsAdmin
 };

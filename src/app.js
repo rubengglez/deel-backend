@@ -7,6 +7,8 @@ const searchContractsByStatuses = require('./use-cases/searchContractsByStatuses
 const retrieveUnpaidJobs = require('./use-cases/retrieveUnpaidJobs')
 const payJob = require('./use-cases/payJob')
 const addDeposit = require('./use-cases/addDeposit');
+const retrieveBestProfession = require('./use-cases/admin/retrieveBestProfession');
+const retrieveBestClients = require('./use-cases/admin/retrieveBestClients');
 
 const app = express();
 app.use(bodyParser.json());
@@ -50,5 +52,22 @@ app.post('/balances/deposit/:userId', async (req, res) => {
     }
 })
 
+app.get('/admin/best-profession', async (req, res) => {
+    try {
+        const profession = await retrieveBestProfession(req.query.start, req.query.end)
+        res.json({profession})
+    } catch(exception) {
+        res.status(404).end()
+    }
+})
+
+app.get('/admin/best-clients', async (req, res) => {
+    try {
+        const clients = await retrieveBestClients(req.query.start, req.query.end, req.query.limit)
+        res.json(clients)
+    } catch(exception) {
+        res.status(404).end()
+    }
+})
 
 module.exports = app;

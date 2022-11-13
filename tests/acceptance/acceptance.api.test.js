@@ -141,4 +141,54 @@ describe('Given api is running', function() {
 			return expect(ApiClient.deposit(client.id, 30, client.id)).rejects.toThrow('Forbidden')
 		})
 	})
+
+	it('should return the best profession, end date not included', async () => {
+		let start = '2020-08-09T00:00:00.0Z'
+		let end = '2020-08-11T00:00:00.0Z'
+		const musician = await ApiClient.bestProfessionAsAdmin(start, end)
+		expect(musician).toEqual({'profession': 'Musician'})
+
+		start = '2020-08-09T00:00:00.0Z'
+		end = '2020-08-20T00:00:00.0Z'
+		const programmer = await ApiClient.bestProfessionAsAdmin(start, end)
+		expect(programmer).toEqual({'profession': 'Programmer'})
+	})
+
+	it('should return the best clients with default limit, end date not included', async () => {
+		let start = '2020-08-09T00:00:00.0Z'
+		let end = '2020-08-31T00:00:00.0Z'
+		let clients = await ApiClient.bestClientsAsAdmin(start, end)
+		expect(clients).toEqual([
+  		{ id: 4, fullName: 'Ash Kethcum', paid: 2020 },
+  		{ id: 2, fullName: 'Mr Robot', paid: 442 },
+		])
+
+		start = '2020-08-09T00:00:00.0Z'
+		end = '2020-08-12T00:00:00.0Z'
+		clients = await ApiClient.bestClientsAsAdmin(start, end)
+		expect(clients).toEqual([
+  		{ id: 1, fullName: 'Harry Potter', paid: 21 }
+		])
+	})
+
+	it('should return the best clients by limit', async () => {
+		const start = '2020-08-09T00:00:00.0Z'
+		const end = '2020-08-31T00:00:00.0Z'
+		let limit = 3
+		let clients = await ApiClient.bestClientsAsAdmin(start, end, limit)
+		expect(clients).toEqual([
+  		{ id: 4, fullName: 'Ash Kethcum', paid: 2020 },
+  		{ id: 2, fullName: 'Mr Robot', paid: 442 },
+  		{ id: 1, fullName: 'Harry Potter', paid: 442 },
+		])
+
+		limit = 10
+		clients = await ApiClient.bestClientsAsAdmin(start, end, limit)
+		expect(clients).toEqual([
+  		{ id: 4, fullName: 'Ash Kethcum', paid: 2020 },
+  		{ id: 2, fullName: 'Mr Robot', paid: 442 },
+  		{ id: 1, fullName: 'Harry Potter', paid: 442 },
+  		{ id: 3, fullName: 'John Snow', paid: 200 }
+		])
+	})
 })
