@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const { Op } = require("sequelize");
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -11,6 +12,27 @@ class Profile extends Sequelize.Model {
       return this.id === contract.ClientId
     }
     return this.id === contract.ContractorId
+  }
+
+  async retrieveContractsByStatus(statuses) {
+    if (this.#isClient()) {
+      return this.getClient({
+        where: {
+          clientId: this.id,
+          status: {
+            [Op.in]: statuses
+          }
+        }
+      })
+    }
+    return this.getContractor({
+        where: {
+          contractorId: this.id,
+          status: {
+            [Op.in]: statuses
+          }
+        }
+      })
   }
 
   #isClient() {

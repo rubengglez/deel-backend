@@ -22,4 +22,24 @@ describe('Given api is running', function() {
 		const contractId = 4
 		return expect(ApiClient.getContract(contractId, profileId)).rejects.toThrow("Not Found")
 	})
+
+	it('should retrieve a list of non terminated contracts for contractor', async () => {
+		const profileId = 6
+		const contracts = await ApiClient.contracts(profileId)
+		expect(contracts).toHaveLength(3)
+		expect(contracts[0].id).toEqual(2)
+		expect(contracts[0].status).toEqual("in_progress")
+		expect(contracts[1].id).toEqual(3)
+		expect(contracts[1].status).toEqual("in_progress")
+		expect(contracts[2].id).toEqual(8)
+		expect(contracts[2].status).toEqual("in_progress")
+	})
+
+	it('should retrieve a list of non terminated contracts for client', async () => {
+		const profileId = 1
+		const contracts = await ApiClient.contracts(profileId)
+		expect(contracts).toHaveLength(1)
+		expect(contracts[0].id).toEqual(2)
+		expect(contracts[0].status).toEqual("in_progress")
+	})
 })
