@@ -7,16 +7,18 @@ const searchContractsByStatuses = require('./use-cases/searchContractsByStatuses
 
 const app = express();
 app.use(bodyParser.json());
+app.use(getProfile)
 app.set('sequelize', sequelize)
 app.set('models', sequelize.models)
 
-app.get('/contracts/:id',getProfile ,async (req, res) =>{
+app.get('/contracts/:id', async (req, res) =>{
     const {id} = req.params
     const contract = await findContractById(id, req.profile)
     if(!contract) return res.status(404).end()
     res.json(contract)
 })
-app.get('/contracts',getProfile ,async (req, res) =>{
+
+app.get('/contracts', async (req, res) =>{
     const contract = await searchContractsByStatuses(['in_progress', 'new'], req.profile)
     if(!contract) return res.status(404).end()
     res.json(contract)
