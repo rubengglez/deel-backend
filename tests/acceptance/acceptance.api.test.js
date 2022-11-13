@@ -42,4 +42,20 @@ describe('Given api is running', function() {
 		expect(contracts[0].id).toEqual(2)
 		expect(contracts[0].status).toEqual("in_progress")
 	})
+
+	it('should retrieve a list of unpaid jobs for contractor', async () => {
+		const profileId = 5
+		const unpaidJobs = await ApiClient.unpaidJobs(profileId)
+		expect(unpaidJobs).toHaveLength(0)
+	})
+
+	it('should retrieve a list of unpaid jobs for client', async () => {
+		const profileId = 2
+		const unpaidJobs = await ApiClient.unpaidJobs(profileId)
+		expect(unpaidJobs).toHaveLength(2)
+		expect(unpaidJobs[0].price).toEqual(202)
+		expect(unpaidJobs[0].ContractId).toEqual(3)
+		expect(unpaidJobs[1].price).toEqual(200)
+		expect(unpaidJobs[1].ContractId).toEqual(4)
+	})
 })

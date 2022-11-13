@@ -28,7 +28,6 @@ async function contracts(profileId) {
 
 async function unpaidJobs(profileId) {
 	try {
-
 		const response = await axios.get(`${URL}/jobs/unpaid`, headers(profileId));
 		return response.data;
 	} catch (err) {
@@ -39,4 +38,5 @@ async function unpaidJobs(profileId) {
 module.exports = {
 	getContract,
 	contracts,
+	unpaidJobs,
 };
