@@ -1,4 +1,4 @@
-const {sequelize} = require('../model')
+const {sequelize} = require('../domain/model')
 const { Op, Transaction } = require("sequelize");
 
 const addDeposit = async (clientId, amount, profile) => {

@@ -1,4 +1,4 @@
-const {sequelize} = require('../model')
+const {sequelize} = require('../domain/model')
 const { Op } = require("sequelize");
 
 const searchContractsByStatuses = require('./searchContractsByStatuses')

@@ -1,4 +1,4 @@
-const {sequelize} = require('../model')
+const {sequelize} = require('../domain/model')
 const { Transaction } = require("sequelize");
 
 const payJob = async (jobId, profile) => {
@@ -26,6 +26,7 @@ const payJob = async (jobId, profile) => {
 			return Promise.reject(new Error('job does not belongs to client'))
 		}
 
+		console.log('aaaaa', job)
 		const contract = await job.getContract()
 		const client = await contract.getClient()
 		await client.pay(job, t)

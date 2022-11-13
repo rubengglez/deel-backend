@@ -1,4 +1,4 @@
-const {sequelize} = require('../../src/model')
+const {sequelize} = require('../../src/domain/model')
 const ApiClient = require('./ApiClient')
 
 describe('Given api is running', function() {
@@ -64,21 +64,48 @@ describe('Given api is running', function() {
 		return expect(ApiClient.pay(jobId, profileId)).rejects.toThrow('Forbidden')
 	})
 
-	it('job is paid, then job disappear from unpaid jobs', async () => {
-		const profileId = 2
-		const jobId = 3
-		let unpaidJobs = await ApiClient.unpaidJobs(profileId)
-		expect(unpaidJobs).toHaveLength(2)
-		expect(unpaidJobs[0].price).toEqual(202)
-		expect(unpaidJobs[0].ContractId).toEqual(3)
-		expect(unpaidJobs[1].price).toEqual(200)
-		expect(unpaidJobs[1].ContractId).toEqual(4)
+	describe('given a job is unpaid', () => {
+		let job, client, contract
 
-		await ApiClient.pay(jobId, profileId)
+		beforeEach(async () => {
+			const {Job, Profile, Contract} = sequelize.models
+			client = await Profile.create({
+				firstName: 'test',
+				lastName: 'test',
+				profession: 'test',
+				balance: 1000,
+				type:'client'
+			})
+			contract = await Contract.create({
+      	terms: 'bla bla bla',
+      	status: 'in_progress',
+      	ClientId: client.id,
+      	ContractorId: 6
+    	})
+			job = await Job.create({
+				description: 'work',
+      	price: 101,
+      	ContractId: contract.id,
+			})
 
-		unpaidJobs = await ApiClient.unpaidJobs(profileId)
-		expect(unpaidJobs).toHaveLength(1)
-		expect(unpaidJobs[0].price).toEqual(200)
+			let unpaidJobs = await ApiClient.unpaidJobs(client.id)
+			expect(unpaidJobs).toHaveLength(1)
+			expect(unpaidJobs[0].price).toEqual(101)
+			expect(unpaidJobs[0].ContractId).toEqual(contract.id)
+		})
+
+		afterEach(async () => Promise.all([
+			job.destroy(),
+			client.destroy(),
+			contract.destroy()
+		]))
+
+		it('job is paid, then job disappear from unpaid jobs', async () => {
+			await ApiClient.pay(job.id, client.id)
+
+			unpaidJobs = await ApiClient.unpaidJobs(client.id)
+			expect(unpaidJobs).toHaveLength(0)
+		})
 	})
 
 	it('nothing happens if job is already paid', async () => {

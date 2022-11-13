@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {sequelize} = require('./model')
+const {sequelize} = require('./domain/model')
 const {getProfile} = require('./middleware/getProfile')
 const findContractById = require('./use-cases/findContractById')
 const searchContractsByStatuses = require('./use-cases/searchContractsByStatuses')
@@ -13,7 +13,6 @@ const retrieveBestClients = require('./use-cases/admin/retrieveBestClients');
 const app = express();
 app.use(bodyParser.json());
 app.use(getProfile)
-app.set('sequelize', sequelize)
 app.set('models', sequelize.models)
 
 app.get('/contracts/:id', async (req, res) =>{

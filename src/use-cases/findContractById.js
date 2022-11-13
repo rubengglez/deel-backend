@@ -1,4 +1,4 @@
-const {sequelize} = require('../model')
+const {sequelize} = require('../domain/model')
 
 const findContractById = async (contractId, profile) => {
 	const {Contract} = sequelize.models

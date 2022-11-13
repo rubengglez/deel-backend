@@ -1,4 +1,4 @@
-const {sequelize} = require('../../model')
+const {sequelize} = require('../../domain/model')
 const { QueryTypes } = require("sequelize");
 
 const DEFAULT_LIMIT = 2
