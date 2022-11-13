@@ -17,7 +17,8 @@ const retrieveUnpaidJobs = async (profile) => {
 				[Op.in]: contractsIds
 			},
 			paid: {[Op.is]: null},
-		}
+		},
+		raw: true,
 	})
 }
 

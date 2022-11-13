@@ -23,9 +23,9 @@ app.get('/contracts/:id', async (req, res) =>{
 })
 
 app.get('/contracts', async (req, res) =>{
-    const contract = await searchContractsByStatuses(['in_progress', 'new'], req.profile)
-    if(!contract) return res.status(404).end()
-    res.json(contract)
+    const contracts = await searchContractsByStatuses(['in_progress', 'new'], req.profile)
+    if(!contracts) return res.status(404).end()
+    res.json(contracts)
 })
 
 app.get('/jobs/unpaid', async (req, res) =>{

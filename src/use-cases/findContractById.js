@@ -6,7 +6,7 @@ const findContractById = async (contractId, profile) => {
 	if (!contract || !profile.canAccess(contract)) {
 		return null
 	}
-	return contract
+	return contract.toJSON()
 }
 
 module.exports = findContractById
