@@ -35,8 +35,18 @@ async function unpaidJobs(profileId) {
 	}
 }
 
+async function pay(jobId, profileId) {
+	try {
+		const response = await axios.post(`${URL}/jobs/${jobId}/pay`, {}, headers(profileId));
+		return response.data;
+	} catch (err) {
+		throw new Error(err.response.statusText);
+	}
+}
+
 module.exports = {
 	getContract,
 	contracts,
 	unpaidJobs,
+	pay,
 };

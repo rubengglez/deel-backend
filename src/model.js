@@ -3,19 +3,19 @@ const { Op } = require("sequelize");
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite3'
+  storage: './database.sqlite3',
 });
 
 class Profile extends Sequelize.Model {
   canAccess(contract) {
-    if (this.#isClient()) {
+    if (this.isClient()) {
       return this.id === contract.ClientId
     }
     return this.id === contract.ContractorId
   }
 
   async retrieveContractsByStatus(statuses) {
-    if (this.#isClient()) {
+    if (this.isClient()) {
       return this.getClient({
         where: {
           clientId: this.id,
@@ -35,8 +35,23 @@ class Profile extends Sequelize.Model {
       })
   }
 
-  #isClient() {
+  isClient() {
     return this.type === 'client'
+  }
+
+  async pay(job, t) {
+    if (!this.isClient()) {
+      return Promise.reject('only a client can be paid')
+    }
+
+    if (this.balance < job.price) {
+     return Promise.reject('job can not be paid due to not enough money in balance')
+    }
+
+    this.balance -= job.price
+
+    await this.save({ transaction: t })
+    await job.pay(t)
   }
 }
 
@@ -84,7 +99,14 @@ Contract.init(
   }
 );
 
-class Job extends Sequelize.Model {}
+class Job extends Sequelize.Model {
+  async pay(t) {
+    this.paid = true;
+    this.paymentDate = new Date()
+    return this.save({transaction: t})
+  }
+}
+
 Job.init(
   {
     description: {

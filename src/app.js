@@ -5,6 +5,7 @@ const {getProfile} = require('./middleware/getProfile')
 const findContractById = require('./use-cases/findContractById')
 const searchContractsByStatuses = require('./use-cases/searchContractsByStatuses')
 const retrieveUnpaidJobs = require('./use-cases/retrieveUnpaidJobs')
+const payJob = require('./use-cases/payJob')
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,6 +29,15 @@ app.get('/contracts', async (req, res) =>{
 app.get('/jobs/unpaid', async (req, res) =>{
     const unpaidJobs = await retrieveUnpaidJobs(req.profile)
     res.json(unpaidJobs)
+})
+
+app.post('/jobs/:job_id/pay', async (req, res) => {
+    try {
+        await payJob(req.params.job_id, req.profile)
+        res.json()
+    } catch(exception) {
+        res.status(403).end()
+    }
 })
 
 module.exports = app;

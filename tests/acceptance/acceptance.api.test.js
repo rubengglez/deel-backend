@@ -1,14 +1,6 @@
 const ApiClient = require('./ApiClient')
 
 describe('Given api is running', function() {
-	beforeEach(() => {
-
-	})
-
-	afterEach(() => {
-
-	})
-
 	it('should retrieve a contract by id', async () => {
 		const profileId = 2
 		const contractId = 4
@@ -57,5 +49,34 @@ describe('Given api is running', function() {
 		expect(unpaidJobs[0].ContractId).toEqual(3)
 		expect(unpaidJobs[1].price).toEqual(200)
 		expect(unpaidJobs[1].ContractId).toEqual(4)
+	})
+
+	it('job can not be paid because profile is not a client', async () => {
+		const profileId = 4
+		const jobId = 1
+		return expect(ApiClient.pay(jobId, profileId)).rejects.toThrow('Forbidden')
+	})
+
+	it('job can not be paid because does not belongs to the profile', async () => {
+		const profileId = 3
+		const jobId = 7
+		return expect(ApiClient.pay(jobId, profileId)).rejects.toThrow('Forbidden')
+	})
+
+	it('job is paid, then job disappear from unpaid jobs', async () => {
+		const profileId = 2
+		const jobId = 3
+		let unpaidJobs = await ApiClient.unpaidJobs(profileId)
+		expect(unpaidJobs).toHaveLength(2)
+		expect(unpaidJobs[0].price).toEqual(202)
+		expect(unpaidJobs[0].ContractId).toEqual(3)
+		expect(unpaidJobs[1].price).toEqual(200)
+		expect(unpaidJobs[1].ContractId).toEqual(4)
+
+		await ApiClient.pay(jobId, profileId)
+
+		unpaidJobs = await ApiClient.unpaidJobs(profileId)
+		expect(unpaidJobs).toHaveLength(1)
+		expect(unpaidJobs[0].price).toEqual(200)
 	})
 })
